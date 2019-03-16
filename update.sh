@@ -7,4 +7,4 @@ tmp="$(mktemp)"
 
 curl "$API" -o "$tmp"
 "$PYTHON" /home/fh/apk/apk.py "$tmp" > "$OUT"
-rm $tmp
+rm "$tmp"
