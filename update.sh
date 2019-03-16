@@ -6,5 +6,5 @@ OUT="/var/www/hoppner/apk_raw.html" # Output file for the table
 tmp="$(mktemp)"
 
 curl "$API" -o "$tmp"
-"$PYTHON" /home/fh/apk.py "$tmp" |> "$OUT"
+"$PYTHON" /home/fh/apk/apk.py "$tmp" > "$OUT"
 rm $tmp
