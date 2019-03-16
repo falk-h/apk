@@ -104,7 +104,7 @@ for category in categories:
         packaging = drink.find('Forpackning').text
         abv = drink.find('Alkoholhalt').text
         size = '{0:.5g}&nbsp;ml'.format(float(drink.find('Volymiml').text))
-        price = '{}0&nbsp;kr'.format(float(drink.find('Prisinklmoms').text) + (1 if drink.find('Forpackning').text == 'Burk' else 0))
+        price = '{0:.2f}&nbsp;kr'.format(float(drink.find('Prisinklmoms').text) + (1 if drink.find('Forpackning').text == 'Burk' else 0))
         number = drink.find('nr').text
 
         print('<tr><td class="id">{}</td><td>{}</td><td><a href="https://systembolaget.se/{}">{}</a></td><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td></tr>'
