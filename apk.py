@@ -120,11 +120,12 @@ for category in categories:
 basenBeers = beers.copy()
 basenCiders = ciders.copy()
 
-basenBeers.sort(key=basenApk, reverse=True)
-basenCiders.sort(key=basenApk, reverse=True)
+basenCategories = [['Basenöl', basenBeers], ['Basencider', basenCiders]]
 
-categories.append(['Basenöl', basenBeers])
-categories.append(['Basencider', basenCiders])
+for category in basenCategories:
+    print('&nbsp;<a href="#{}">{}</a>'.format(category[0], category[0]))
+    category[1].sort(key=basenApk, reverse=True)
+    categories.append(category)
 
 print('<br/><br/>')
 
