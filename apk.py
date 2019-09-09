@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import sys
 import datetime
+import math
 
 # Returns alcohol per krona for a drink, in ml/kr
 # Includes the deposit for cans in the calculated price
@@ -12,6 +13,33 @@ def apk(drink):
     if drink.find('Forpackning').text == 'Burk':
         price += 1.0 # Add deposit
     return abv * size / price
+
+# Returns alcohol per krona for a drink if it were sold in Basen, in ml/kr
+# Includes the deposit for cans in the calculated price
+def basenApk(drink):
+    price = basenPrice(drink)
+    abv = float(drink.find('Alkoholhalt').text.strip('%'))/100 # Alcohol by volume (0-1)
+    size = float(drink.find('Volymiml').text)
+
+    return abv * size / price
+
+# Returns the price a drink would have if it was sold in Basen
+# The price is calculated as the price from Systembolaget (including deposit) 
+# plus 25%, rounded up to the next five kronor. In addition to this, 33cl drinks
+# may not cost less than 20 kr, and 500 ml drinks may not cost less than 30 kr.
+def basenPrice(drink):
+    price = float(drink.find('Prisinklmoms').text)
+    size = float(drink.find('Volymiml').text)
+
+    if drink.find('Forpackning').text == 'Burk':
+        price += 1.0 # Add deposit
+
+    price = math.ceil(price*1.25/5)*5
+
+    if size < 400:
+        return max(price, 20)
+    else:
+        return max(price, 30)
 
 # Returns False for non-alcoholic products, like gift boxes and water
 def hasAlcohol(drink):
@@ -89,12 +117,28 @@ for category in categories:
     print('&nbsp;<a href="#{}">{}</a>'.format(category[0], category[0]))
     category[1].sort(key=apk, reverse=True)
 
+basenBeers = beers.copy()
+basenCiders = ciders.copy()
+
+basenBeers.sort(key=basenApk, reverse=True)
+basenCiders.sort(key=basenApk, reverse=True)
+
+categories.append(['Basenöl', basenBeers])
+categories.append(['Basencider', basenCiders])
+
 print('<br/><br/>')
 
 for category in categories:
     print('<br id="{}"/><h2>{}!</h2><table><tr><th/><th>APK</th><th>Namn</th><th>Stil</th><th>Förpackning</th><th>Alkoholhalt</th><th>Storlek</th><th>Pris (ink pant)</th></tr>'.format(category[0], category[0]))
     for index, drink in enumerate(category[1]):
-        drinkApk='{0:.5g}&nbsp;ml/kr'.format(apk(drink))
+        drinkApk=''
+        price=''
+        if category[0].startswith('Basen'):
+            drinkApk='{0:.5g}&nbsp;ml/kr'.format(basenApk(drink))
+            price = '{0:.2f}&nbsp;kr'.format(basenPrice(drink))
+        else:
+            drinkApk='{0:.5g}&nbsp;ml/kr'.format(apk(drink))
+            price = '{0:.2f}&nbsp;kr'.format(float(drink.find('Prisinklmoms').text) + (1 if drink.find('Forpackning').text == 'Burk' else 0))
         name = ''
         if drink.find('Namn2').text == None:
             name = drink.find('Namn').text
@@ -104,7 +148,6 @@ for category in categories:
         packaging = drink.find('Forpackning').text
         abv = drink.find('Alkoholhalt').text
         size = '{0:.5g}&nbsp;ml'.format(float(drink.find('Volymiml').text))
-        price = '{0:.2f}&nbsp;kr'.format(float(drink.find('Prisinklmoms').text) + (1 if drink.find('Forpackning').text == 'Burk' else 0))
         number = drink.find('nr').text
 
         print('<tr><td class="id">{}</td><td>{}</td><td><a href="https://systembolaget.se/{}">{}</a></td><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td></tr>'

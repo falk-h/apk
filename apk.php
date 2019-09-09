@@ -55,6 +55,7 @@
                         Exkluderar förhoppningsvis dricka utan alkohol, lokalt och småskaligt, och beställningsvaror.<br />
                         Systemet förklarar inte vad kategorierna i API:t betyder, så vissa sådana grejer kanske finns med ändå. ¯\_(ツ)_/¯<br />
                         Uppdateras automatiskt via <a href="https://www.systembolaget.se/api">Systemets API</a> varje natt.<br />
+                        Listorna med basendricka anger vad drickan hade kostat om den hade sålts i Basen.<br />
                         <?php
                         include 'apk_raw.html';
                         ?>
